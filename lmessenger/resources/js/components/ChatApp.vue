@@ -1,8 +1,8 @@
 <template>
 	<div class="app-container">
 		<Navigation :user="user" :room="room" @userListClickEvent="openSideBar('users')" @settingsClickEvent="openSideBar('settings')" />
-		<ChatMessageFeed @loadMoreMessages="getMessageHistory" :messages="chatMessages" :user="user" />
-		<ChatMessageComposer @sendEvent="onRegisterNewMessage" @userTypingEvent="onTypingEvent" :typing="isUserTyping" :users="chatUsers" />
+		<ChatMessageFeed @loadMoreMessages="getMessageHistory" :messages="chatMessages" :user="user" :typing="isUserTyping" />
+		<ChatMessageComposer @sendEvent="onRegisterNewMessage" @userTypingEvent="onTypingEvent" :users="chatUsers" />
 		<ChatUsers :users="chatUsers" />
 		<ChatSettings :user="user" />
 		<div id="overlay" @click="hideSideBar" ></div>
@@ -15,7 +15,7 @@ import ChatMessageFeed from './ChatMessageFeed';
 import ChatMessageComposer from './ChatMessageComposer';
 import ChatUsers from './ChatUsers';
 import ChatSettings from './ChatSettings';
-import { clearTimeout, setTimeout } from 'timers';
+// import { clearTimeout, setTimeout } from 'timers';
 
 export default {
 	props: {
@@ -38,7 +38,6 @@ export default {
 			chatUsers: [],
 			chatMessages: [],
 			messageText: '',
-			isUserTyping: false,
 			timerFlag: false,
 			page: 1,
 		}
@@ -57,14 +56,23 @@ export default {
 				this.chatMessages.push( data );
 				setTimeout(() => this.scrollToBottom(), 50);
 			} )
-			.listenForWhisper( 'typingEvent', ( e ) => {
+			// .listenForWhisper( 'typingEvent', ( e ) => {
+
+			// 	if ( this.timerFlag ) clearTimeout( this.timerFlag );
 				
-				this.isUserTyping = e;
+			// 	this.isUserTyping = true;
 
-				if ( this.timerFlag ) clearTimeout( this.timerFlag );
+			// 	const data = {
+			// 		name: e.name,
+			// 		typing: true 
+			// 	}
 
-				this.timerFlag = setTimeout( () => this.isUserTyping = false, 20000 );
-			} );
+			// 	this.typingUsers = this.typingUsers.push(data).filter((v, i, a) => a.indexOf(v) === i);
+
+			// 	console.log(this.typingUsers);
+
+			// 	this.timerFlag = setTimeout( () => this.isUserTyping = false, 20000 );
+			// } );
 	},
 
 	computed: {
@@ -115,11 +123,11 @@ export default {
 
 		},
 
-		onTypingEvent() {
-			this.channel.whisper('typingEvent', {
-				name: this.user.name,
-			});
-		},
+		// onTypingEvent() {
+		// 	this.channel.whisper('typingEvent', {
+		// 		name: this.user.name,
+		// 	});
+		// },
 
 		getMessageHistory($state) {
 			fetch(`/api/messages/history/${this.room.id}?api_token=${this.token}&page=${this.page}`, {

@@ -18,11 +18,6 @@
 			<button v-bind:class="`btn-send ${ message.length !== 0 || isImageAppended ? 'bright' : '' }`" @click.prevent="emitSendEvent">
 				<i class="fas fa-paper-plane fa-lg"></i>
 			</button>
-			<div class="typing-container" v-if="typing">
-				<div v-for="user in users" :key="user.id">
-					<span class="user-typing" v-if="typing.name === user.name">{{ typing.name }} печатает...</span>
-				</div>
-			</div>
 		</div>
 	</div>
 </template>
@@ -30,9 +25,6 @@
 <script>
 export default {
 	props: {
-		typing: {
-			required: true
-		},
 		users: {
 			type: Array,
 			required: true
@@ -42,7 +34,6 @@ export default {
 	data() {
 		return {
 			message: '',
-			typingUsers: [],
 			isImageAppended: false,
 			imageData: '',
 		}
@@ -277,16 +268,6 @@ export default {
 				&.bright {
 					color: rgb(64, 212, 235);
 				}
-			}
-
-			.typing-container {
-				position: absolute;
-				left: 0;
-				top: -40px;
-				display: flex;
-				flex-direction: column-reverse;
-				color: #fff;
-				font-size: 20px;
 			}
 		}
 	}

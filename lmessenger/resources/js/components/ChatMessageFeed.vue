@@ -31,12 +31,17 @@ export default {
 		user: {
 			type: Object,
 			required: true
+		},
+		typing: {
+			type: String,
+			required: true
 		}
 	},
 
 	data() {
 		return {
 			chatMessages: this.messages,
+			typingUsers: [],
 		}
 	},
 

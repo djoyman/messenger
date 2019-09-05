@@ -1813,8 +1813,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ChatMessageComposer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ChatMessageComposer */ "./resources/js/components/ChatMessageComposer.vue");
 /* harmony import */ var _ChatUsers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ChatUsers */ "./resources/js/components/ChatUsers.vue");
 /* harmony import */ var _ChatSettings__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ChatSettings */ "./resources/js/components/ChatSettings.vue");
-/* harmony import */ var timers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! timers */ "./node_modules/timers-browserify/main.js");
-/* harmony import */ var timers__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(timers__WEBPACK_IMPORTED_MODULE_5__);
 //
 //
 //
@@ -1830,7 +1828,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
+ // import { clearTimeout, setTimeout } from 'timers';
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -1852,7 +1850,6 @@ __webpack_require__.r(__webpack_exports__);
       chatUsers: [],
       chatMessages: [],
       messageText: '',
-      isUserTyping: false,
       timerFlag: false,
       page: 1
     };
@@ -1873,16 +1870,20 @@ __webpack_require__.r(__webpack_exports__);
 
       _this.chatMessages.push(data);
 
-      Object(timers__WEBPACK_IMPORTED_MODULE_5__["setTimeout"])(function () {
+      setTimeout(function () {
         return _this.scrollToBottom();
       }, 50);
-    }).listenForWhisper('typingEvent', function (e) {
-      _this.isUserTyping = e;
-      if (_this.timerFlag) Object(timers__WEBPACK_IMPORTED_MODULE_5__["clearTimeout"])(_this.timerFlag);
-      _this.timerFlag = Object(timers__WEBPACK_IMPORTED_MODULE_5__["setTimeout"])(function () {
-        return _this.isUserTyping = false;
-      }, 20000);
-    });
+    }); // .listenForWhisper( 'typingEvent', ( e ) => {
+    // 	if ( this.timerFlag ) clearTimeout( this.timerFlag );
+    // 	this.isUserTyping = true;
+    // 	const data = {
+    // 		name: e.name,
+    // 		typing: true 
+    // 	}
+    // 	this.typingUsers = this.typingUsers.push(data).filter((v, i, a) => a.indexOf(v) === i);
+    // 	console.log(this.typingUsers);
+    // 	this.timerFlag = setTimeout( () => this.isUserTyping = false, 20000 );
+    // } );
   },
   computed: {
     channel: function channel() {
@@ -1922,18 +1923,18 @@ __webpack_require__.r(__webpack_exports__);
         _this2.chatMessages.push(msg);
 
         _this2.messageText = '';
-        Object(timers__WEBPACK_IMPORTED_MODULE_5__["setTimeout"])(function () {
+        setTimeout(function () {
           return _this2.scrollToBottom();
         }, 50);
       })["catch"](function (err) {
         return console.log(err);
       });
     },
-    onTypingEvent: function onTypingEvent() {
-      this.channel.whisper('typingEvent', {
-        name: this.user.name
-      });
-    },
+    // onTypingEvent() {
+    // 	this.channel.whisper('typingEvent', {
+    // 		name: this.user.name,
+    // 	});
+    // },
     getMessageHistory: function getMessageHistory($state) {
       var _this3 = this;
 
@@ -2023,16 +2024,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    typing: {
-      required: true
-    },
     users: {
       type: Array,
       required: true
@@ -2041,7 +2034,6 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       message: '',
-      typingUsers: [],
       isImageAppended: false,
       imageData: ''
     };
@@ -2205,11 +2197,16 @@ __webpack_require__.r(__webpack_exports__);
     user: {
       type: Object,
       required: true
+    },
+    typing: {
+      type: String,
+      required: true
     }
   },
   data: function data() {
     return {
-      chatMessages: this.messages
+      chatMessages: this.messages,
+      typingUsers: []
     };
   },
   methods: {
@@ -9328,7 +9325,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".message-composer[data-v-5e9d1634] {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: stretch;\n}\n.message-composer .image-preview[data-v-5e9d1634] {\n  background: #131d29;\n  height: 120px;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  padding: 8px 8px 8px 16px;\n}\n.message-composer .image-preview .preview-container[data-v-5e9d1634] {\n  text-align: center;\n  position: relative;\n}\n.message-composer .image-preview .preview-container #btn-remove-img[data-v-5e9d1634] {\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  right: 0;\n  top: 0;\n  background: #000;\n  color: #fff;\n  border: none;\n  border-radius: 50%;\n  outline: none;\n}\n.message-composer .image-preview .preview-container #preview[data-v-5e9d1634] {\n  height: 80px;\n  border-radius: 5px;\n}\n.message-composer .hidden[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer[data-v-5e9d1634] {\n  display: flex;\n  height: 40px;\n  background: #192533;\n  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.08);\n  z-index: 1;\n  position: relative;\n}\n.message-composer .main-composer .composer[data-v-5e9d1634] {\n  width: calc(100% - 120px);\n  padding: 8px 8px 8px 12px;\n  resize: none;\n  outline: none;\n  background: #192533;\n  color: #fff;\n  border: none;\n}\n.message-composer .main-composer .image-upload[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-right: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n  text-align: center;\n}\n.message-composer .main-composer .image-upload label[data-v-5e9d1634] {\n  margin: 0 auto;\n}\n.message-composer .main-composer .image-upload #file[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer .btn-send[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-left: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n}\n.message-composer .main-composer .btn-send.bright[data-v-5e9d1634] {\n  color: #40d4eb;\n}\n.message-composer .main-composer .typing-container[data-v-5e9d1634] {\n  position: absolute;\n  left: 0;\n  top: -40px;\n  display: flex;\n  flex-direction: column-reverse;\n  color: #fff;\n  font-size: 20px;\n}", ""]);
+exports.push([module.i, ".message-composer[data-v-5e9d1634] {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: stretch;\n}\n.message-composer .image-preview[data-v-5e9d1634] {\n  background: #131d29;\n  height: 120px;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  padding: 8px 8px 8px 16px;\n}\n.message-composer .image-preview .preview-container[data-v-5e9d1634] {\n  text-align: center;\n  position: relative;\n}\n.message-composer .image-preview .preview-container #btn-remove-img[data-v-5e9d1634] {\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  right: 0;\n  top: 0;\n  background: #000;\n  color: #fff;\n  border: none;\n  border-radius: 50%;\n  outline: none;\n}\n.message-composer .image-preview .preview-container #preview[data-v-5e9d1634] {\n  height: 80px;\n  border-radius: 5px;\n}\n.message-composer .hidden[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer[data-v-5e9d1634] {\n  display: flex;\n  height: 40px;\n  background: #192533;\n  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.08);\n  z-index: 1;\n  position: relative;\n}\n.message-composer .main-composer .composer[data-v-5e9d1634] {\n  width: calc(100% - 120px);\n  padding: 8px 8px 8px 12px;\n  resize: none;\n  outline: none;\n  background: #192533;\n  color: #fff;\n  border: none;\n}\n.message-composer .main-composer .image-upload[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-right: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n  text-align: center;\n}\n.message-composer .main-composer .image-upload label[data-v-5e9d1634] {\n  margin: 0 auto;\n}\n.message-composer .main-composer .image-upload #file[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer .btn-send[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-left: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n}\n.message-composer .main-composer .btn-send.bright[data-v-5e9d1634] {\n  color: #40d4eb;\n}", ""]);
 
 // exports
 
@@ -48379,12 +48376,16 @@ var render = function() {
       }),
       _vm._v(" "),
       _c("ChatMessageFeed", {
-        attrs: { messages: _vm.chatMessages, user: _vm.user },
+        attrs: {
+          messages: _vm.chatMessages,
+          user: _vm.user,
+          typing: _vm.isUserTyping
+        },
         on: { loadMoreMessages: _vm.getMessageHistory }
       }),
       _vm._v(" "),
       _c("ChatMessageComposer", {
-        attrs: { typing: _vm.isUserTyping, users: _vm.chatUsers },
+        attrs: { users: _vm.chatUsers },
         on: {
           sendEvent: _vm.onRegisterNewMessage,
           userTypingEvent: _vm.onTypingEvent
@@ -48510,24 +48511,7 @@ var render = function() {
           }
         },
         [_c("i", { staticClass: "fas fa-paper-plane fa-lg" })]
-      ),
-      _vm._v(" "),
-      _vm.typing
-        ? _c(
-            "div",
-            { staticClass: "typing-container" },
-            _vm._l(_vm.users, function(user) {
-              return _c("div", { key: user.id }, [
-                _vm.typing.name === user.name
-                  ? _c("span", { staticClass: "user-typing" }, [
-                      _vm._v(_vm._s(_vm.typing.name) + " печатает...")
-                    ])
-                  : _vm._e()
-              ])
-            }),
-            0
-          )
-        : _vm._e()
+      )
     ])
   ])
 }
