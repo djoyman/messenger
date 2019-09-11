@@ -16,7 +16,7 @@ class Message extends Model
 	
 	public static function create( Array $data ) {
 
-		$messageLimit = 20;
+		$messageLimit = 500000;
 
 		$setChannel = 'messages:room:' . $data['room_id'];
 
@@ -113,15 +113,8 @@ class Message extends Model
 
 		foreach($valuesFromSet as $msg) {
 			$hashKey = 'conversation:room:' . $roomId . $msg;
-			$msgFields = Redis::hvals($hashKey); // ['from', 'name', ...]
-			$messages[] = array(
-				'date' => $msgFields[0], 
-				'name' => $msgFields[1],
-				'content' => $msgFields[2],
-				'from' => $msgFields[3],
-				'room_id' => $msgFields[4],
-				'attachment' => $msgFields[5]
-			);
+			$hashData = Redis::hgetall($hashKey);
+			$messages[] = $hashData;
 		}
 
 		return $messages;

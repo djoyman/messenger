@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api', 'throttle:60,10'])->group(function () {
 
 	Route::post('messages', 'MessageController@send');
 

@@ -1,11 +1,17 @@
 <template>
 	<div class="app-container">
 		<Navigation :user="user" :room="room" @userListClickEvent="openSideBar('users')" @settingsClickEvent="openSideBar('settings')" />
-		<ChatMessageFeed @loadMoreMessages="getMessageHistory" :messages="chatMessages" :user="user" :typing="isUserTyping" />
-		<ChatMessageComposer @sendEvent="onRegisterNewMessage" @userTypingEvent="onTypingEvent" :users="chatUsers" />
+		<ChatMessageFeed @loadMoreMessages="getMessageHistory" @onPreviewClick="makePreview" :messages="chatMessages" :user="user" />
+		<ChatMessageComposer @sendEvent="onRegisterNewMessage" :users="chatUsers" />
 		<ChatUsers :users="chatUsers" />
-		<ChatSettings :user="user" />
+		<!-- <ChatSettings :user="user" /> -->
 		<div id="overlay" @click="hideSideBar" ></div>
+		<div id="img-preview" style="display:none;">
+			<button id="preview-close">Закрыть</button>
+			<div class="img-wrapper">
+				<img id="img-src" src="#">
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -15,7 +21,8 @@ import ChatMessageFeed from './ChatMessageFeed';
 import ChatMessageComposer from './ChatMessageComposer';
 import ChatUsers from './ChatUsers';
 import ChatSettings from './ChatSettings';
-// import { clearTimeout, setTimeout } from 'timers';
+import Hammer from 'hammerjs';
+import { clearTimeout, setTimeout } from 'timers';
 
 export default {
 	props: {
@@ -44,7 +51,7 @@ export default {
 	},
 
 	created() {
-
+		
 		this.channel
 			.here( users => this.chatUsers = users )
 
@@ -105,7 +112,7 @@ export default {
 				'attachment': msgData.image
 			}
 
-			fetch(`/api/messages?api_token=${this.token}`, {
+			fetch(`../api/messages?api_token=${this.token}`, {
 				method: 'post',
 				body: JSON.stringify(msg), 
 				headers: {
@@ -114,7 +121,12 @@ export default {
 					'X-Socket-ID': window.Echo.socketId()
 				}
 			})
-			.then( () => {
+			.then( (res) => {
+				// 429 - Too many requests
+				if (res.status === 429) {
+					alert('Too many attempts! Stop spamming');
+					return;
+				}
 				this.chatMessages.push( msg );
 				this.messageText = '';
 				setTimeout(() => this.scrollToBottom(), 50);
@@ -130,7 +142,7 @@ export default {
 		// },
 
 		getMessageHistory($state) {
-			fetch(`/api/messages/history/${this.room.id}?api_token=${this.token}&page=${this.page}`, {
+			fetch(`../api/messages/history/${this.room.id}?api_token=${this.token}&page=${this.page}`, {
 				method: 'get',
 				headers: {
 					'X-CSRF-TOKEN': document.head.querySelector('meta[name="csrf-token"]').content,
@@ -168,9 +180,116 @@ export default {
 
 		hideSideBar() {
 			document.getElementById('users').style.width = '0';
-			document.getElementById('settings').style.width = '0';
+			// document.getElementById('settings').style.width = '0';
 			document.getElementById('overlay').style.visibility = 'hidden';
 			document.getElementById('overlay').style.opacity = '0';
+		},
+
+		makePreview(src) {
+			const container = document.getElementById('img-preview');
+			container.style.display = 'flex';
+
+			const img = document.getElementById('img-src');
+			img.onload = function() {
+				if (img.naturalWidth >= img.naturalHeight) {
+					console.log(img.naturalWidth, img.naturalHeight, 'more');
+					img.style.width = '100%';
+					img.style.height = 'auto';
+				} else {
+					console.log(img.naturalWidth, img.naturalHeight, 'less');
+					img.style.width = 'auto';
+					img.style.height = '100%';
+				}
+			}
+
+			img.src = src;
+			img.style.width = '100%';
+			
+			const btn = document.getElementById('preview-close');
+			btn.addEventListener('click', function() {
+				container.style.display = 'none';
+				img.src = '';
+			});
+
+			const hammertime = new Hammer(img, {});
+			hammertime.get('pinch').set({
+				enable: true
+			});
+			let posX = 0,
+				posY = 0,
+				scale = 1,
+				last_scale = 1,
+				last_posX = 0,
+				last_posY = 0,
+				max_pos_x = 0,
+				max_pos_y = 0,
+				transform = '',
+				el = img;
+
+			hammertime.on('doubletap pan pinch panend pinchend', function(ev) {
+				if (ev.type == "doubletap") {
+					transform =
+						'translate3d(0, 0, 0) ' +
+						'scale3d(2, 2, 1) ';
+					scale = 2;
+					last_scale = 2;
+					try {
+						if (window.getComputedStyle(el, null).getPropertyValue('-webkit-transform').toString() != 'matrix(1, 0, 0, 1, 0, 0)') {
+							transform =
+								'translate3d(0, 0, 0) ' +
+								'scale3d(1, 1, 1) ';
+							scale = 1;
+							last_scale = 1;
+						}
+					} catch (err) {}
+					el.style.webkitTransform = transform;
+					transform = '';
+				}
+
+				//pan    
+				if (scale != 1) {
+					posX = last_posX + ev.deltaX;
+					posY = last_posY + ev.deltaY;
+					max_pos_x = Math.ceil((scale - 1) * el.clientWidth / 2);
+					max_pos_y = Math.ceil((scale - 1) * el.clientHeight / 2);
+					if (posX > max_pos_x) {
+						posX = max_pos_x;
+					}
+					if (posX < -max_pos_x) {
+						posX = -max_pos_x;
+					}
+					if (posY > max_pos_y) {
+						posY = max_pos_y;
+					}
+					if (posY < -max_pos_y) {
+						posY = -max_pos_y;
+					}
+				}
+
+				//pinch
+				if (ev.type == 'pinch') {
+					scale = Math.max(.999, Math.min(last_scale * (ev.scale), 4));
+				}
+				if(ev.type == 'pinchend') {
+					last_scale = scale;
+				}
+
+				//panend
+				if(ev.type == 'panend'){
+					last_posX = posX < max_pos_x ? posX : max_pos_x;
+					last_posY = posY < max_pos_y ? posY : max_pos_y;
+				}
+
+				if (scale != 1) {
+					transform =
+						`translate3d(${ posX }px,${ posY }px, 0) 
+						scale3d(${ scale },${ scale }, 1)`;
+				}
+
+				if (transform) {
+					el.style.webkitTransform = transform;
+				}
+			});
 		}
 	},
 
@@ -181,6 +300,12 @@ export default {
 </script>
 
 <style lang="scss" >
+
+	$primaryBg: rgb(25, 37, 51);
+
+	body {
+		background: $primaryBg;
+	}
 	
 	.app-container {
 		height: 100vh;
@@ -199,6 +324,43 @@ export default {
 			transition: visibility 0.5s, opacity 0.5s ease-out;
 			visibility: hidden;
 			opacity: 0;
+		}
+
+		#img-preview {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 2;
+			background: #000;
+
+			#preview-close {
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 100%;
+				z-index: 3;
+				background: rgba($color: #000000, $alpha: 0.7);
+				border: none;
+				color: #fff;
+				padding: 10px;
+			}
+
+			.img-wrapper {
+				width: inherit;
+				height: inherit;
+
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				text-align: center;
+
+				#img-src {
+					transition: scale 150ms linear;
+				}
+			}
 		}
 	}
 </style>

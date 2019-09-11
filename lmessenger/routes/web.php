@@ -15,14 +15,17 @@ Route::get('/', function () {
     return view('/home');
 });
 
-Auth::routes();
+Auth::routes([
+	'register' => false, // Registration Routes...
+	'reset' => false, // Password Reset Routes...
+	'verify' => false, // Email Verification Routes...
+]);
 
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/room/{room}', 'RoomController@index');
 
-Route::get('/chat/access/{id}', 'Auth\LoginController@access');
+Route::get('/access/{id}', 'Auth\LoginController@access');
 
 Route::get('login/{service}', 'Auth\LoginController@redirectToProvider');
-Route::get('login/google/callback', 'Auth\LoginController@handleGoogleProviderCallback');
-Route::get('login/vk/callback', 'Auth\LoginController@handleVkProviderCallback');
+Route::get('login/vkontakte/callback', 'Auth\LoginController@handleVkProviderCallback');

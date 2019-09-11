@@ -11,7 +11,7 @@
 			<div class="content">
 				<p class="name">{{ message.name }} <span class="date">{{ message.date }}</span></p>
 				<p class="text">{{ message.content }}</p>
-				<img class="image" v-if="message.attachment.length > 0" :src="`${ message.attachment }`">
+				<img class="image" @click.prevent="openPreview(message.attachment)" v-if="message.attachment.length > 0" :src="`${ message.attachment }`">
 				<hr class="break">
 			</div>
 		</div>
@@ -31,10 +31,6 @@ export default {
 		user: {
 			type: Object,
 			required: true
-		},
-		typing: {
-			type: String,
-			required: true
 		}
 	},
 
@@ -48,6 +44,10 @@ export default {
 	methods: {
 		infiniteHandler($state) {
 			this.$emit('loadMoreMessages', $state);
+		},
+
+		openPreview(src) {
+			this.$emit('onPreviewClick', src);
 		}
 	},
 
@@ -69,12 +69,12 @@ export default {
 	}
 
 	.feed {
-		height: calc(100% - 80px);
 		background: rgb(25, 37, 51);
 		color: #FFF;
 		overflow-y: scroll;
 		padding-bottom: 8px;
 		padding-top: 8px;
+		margin-top: 60px;
 
 		.inf-style {
 			font-size: 12px;

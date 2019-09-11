@@ -30,6 +30,7 @@ const router = new VueRouter({
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
 Vue.component('chat-app', require('./components/ChatApp.vue').default);
+Vue.component('chat-login', require('./components/auth/Login.vue').default);
 Vue.component('api-token', require('./components/ApiToken.vue').default);
 
 /**

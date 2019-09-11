@@ -35,6 +35,7 @@ export default {
 	li {
 		color: #fff;
 		padding: 14px;
+		white-space: nowrap;
 	}
 
 	.users-container {

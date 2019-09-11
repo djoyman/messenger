@@ -17,6 +17,15 @@
 					You are logged in!
 					
 					<api-token :token="{{ json_encode(Auth::user()->api_token) }}"></api-token>
+					<a href="{{ route('logout') }}"
+						onclick="event.preventDefault();
+										document.getElementById('logout-form').submit();">
+						{{ __('Logout') }}
+					</a>
+
+					<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+						@csrf
+					</form>
                 </div>
             </div>
         </div>

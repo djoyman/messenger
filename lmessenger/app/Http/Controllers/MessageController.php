@@ -38,7 +38,7 @@ class MessageController extends Controller
 		$messages = Message::loadAll($roomId);
 
 		$currentPage = Paginator::resolveCurrentPage();
-		$perPage = 5;
+		$perPage = 50;
 
 		$messages = array_reverse($messages);
 
@@ -57,11 +57,12 @@ class MessageController extends Controller
 				$ext = explode('/',$mime)[1];
 
 				$fileName = mt_rand() . time() . '.' . $ext;
-				$path = public_path().'\\uploads\\images\\' . $fileName;
+				$path = storage_path().'/app/public/uploads/images/' . $fileName;
 
 				Image::make($urlData)->save($path);
 
-				$link = '/uploads/images/' . $fileName;
+				$link = '/chat/images/' . $fileName; // production
+				//$link = '/storage/uploads/images/' . $fileName; // dev
 			}
 		}
 		catch (\Exception $e) {

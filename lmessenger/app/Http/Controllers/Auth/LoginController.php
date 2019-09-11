@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Str;
 use Socialite;
 use App\User;
 use Auth;
 use Cookie;
+use Hash;
 
 class LoginController extends Controller
 {
@@ -29,7 +31,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+	protected $redirectTo = '/home';
 
     /**
      * Create a new controller instance.
@@ -39,6 +41,10 @@ class LoginController extends Controller
     public function __construct()
     {
 		$this->middleware('guest')->except(['logout', 'access']);
+	}
+
+	public function username() {
+		return 'social_id';
 	}
 
 	public function access($id) {
@@ -62,42 +68,6 @@ class LoginController extends Controller
     {
         return Socialite::driver($service)->redirect();
     }
-
-    /**
-     * Obtain the user information from Google.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function handleGoogleProviderCallback()
-    {
-        try {
-            $user = Socialite::driver('google')->user();
-        } catch (Exception $e) {
-			return redirect('/login');
-		}
-		
-		// check if they're an existing user
-		$existingUser = User::where('email', $user->email)->first();
-		
-		if($existingUser){
-            // log them in
-            Auth::login($existingUser, true);
-        } else {
-            // create a new user
-            $newUser                  = new User;
-            $newUser->name            = $user->name;
-            $newUser->email           = $user->email;
-            $newUser->google_id       = $user->id;
-            $newUser->avatar          = $user->avatar;
-            $newUser->avatar_original = $user->avatar_original;
-            $newUser->save();
-            Auth::login($newUser, true);
-		}
-		
-		$room = '/room/' . Cookie::get('room_access');
-
-		return redirect()->to($room);
-	}
 	
 	/**
      * Obtain the user information from VK.
@@ -112,24 +82,25 @@ class LoginController extends Controller
 			return redirect('/login');
 		}
 		
-		// check if they're an existing user
-		$existingUser = User::where('email', $user->email)->first();
+		$existingUser = User::where('social_id', $user->id)->first();
 		
-		if($existingUser){
-            // log them in
+		if($existingUser !== null){
+			// log them in
             Auth::login($existingUser, true);
         } else {
             // create a new user
-            $newUser                  = new User;
-            $newUser->name            = $user->name;
-            $newUser->email           = $user->email;
-            $newUser->google_id       = $user->id;
-            $newUser->avatar          = $user->avatar;
-            $newUser->avatar_original = $user->avatar_original;
+            $newUser                  	= new User;
+			$newUser->name            	= $user->name;
+			$newUser->password			= Hash::make('standartpassword');
+            $newUser->social_id			= $user->id;
+			$newUser->avatar          	= $user->avatar;
+			$newUser->api_token			= Str::random(60);
             $newUser->save();
             Auth::login($newUser, true);
 		}
 		
-        return redirect()->to('/home');
+        $room = '/room/' . Cookie::get('room_access');
+
+		return redirect()->to($room);
     }
 }
