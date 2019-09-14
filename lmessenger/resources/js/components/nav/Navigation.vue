@@ -3,14 +3,28 @@
 		<!-- <button class="menu" @click.prevent="registerSettingsClick" >
 			<i class="fas fa-cog fa-lg"></i>
 		</button> -->
-		<h2 class="header">{{ room.title }}</h2>
+		<h2 class="header" v-if="typing.length === 0">
+			{{ room.title }}
+		</h2>
+		<h2 :class="`header ${ typing.length > 1 ? 'multiple-users' : 'single-user' }`" v-else-if="typing.length > 0 && typing.length <= 2">
+			{{ typing.map(e => e.name).join(', ') }} 
+			<div class="animation-container">
+				<span class="item">.</span>
+				<span class="item">.</span>
+				<span class="item">.</span>
+			</div>
+		</h2>
+		<h2 class="header multiple-users" v-else>
+			Печатают много 
+			<div class="animation-container">
+				<span class="item">.</span>
+				<span class="item">.</span>
+				<span class="item">.</span>
+			</div>
+		</h2>
 		<button class="user-list" @click.prevent="registerUserListClick" >
 			<i class="fas fa-users fa-lg"></i>
 		</button>
-		<!-- <a v-bind:href="route_logout" @click.prevent="logout()" class="nav-element">Logout</a>
-		<form id="logout-form" v-bind:action="route_logout" method="POST" style="display: none;">
-            <input type="hidden" name="_token" v-bind:value="getCSRF">
-        </form> -->
 	</div>
 </template>
 
@@ -24,23 +38,14 @@ export default {
 		room: {
 			type: Object,
 			required: true
+		},
+		typing: {
+			type: Array,
+			required: true
 		}
-		// route_logout: {
-		// 	type: String,
-		// 	required: true
-		// }
 	},
 
-	// computed: {
-	// 	getCSRF() {
-	// 		return document.head.querySelector('meta[name="csrf-token"]').content;
-	// 	}
-	// },
-
 	methods: {
-		// logout() {
-		// 	document.getElementById('logout-form').submit();
-		// }
 
 		registerUserListClick() {
 			this.$emit('userListClickEvent');
@@ -84,6 +89,61 @@ export default {
 			text-align: center;
 			margin: 0;
 			margin-left: 10px;
+			display: flex;
+			max-width: 85%;
+			text-overflow: ellipsis;
+
+			&.single-user {
+				font-size: 16px;
+			}
+
+			&.multiple-users {
+				font-size: 14px;
+			}
+
+			.animation-container {
+				margin-left: 4px;
+
+				.item {
+					-webkit-animation: opacity 1.4s steps(60, start) 0s infinite;
+					animation: opacity 1.4s steps(60, start) 0s infinite;
+				}
+
+				.item:nth-child(1) {
+					-webkit-animation-delay: -1.4s;
+					animation-delay: -1.4s;
+				}
+				
+				.item:nth-child(2) {
+					-webkit-animation-delay: -1.2s;
+					animation-delay: -1.2s;
+				}
+				
+				.item:nth-child(3) {
+					-webkit-animation-delay: -1s;
+					animation-delay: -1s;
+				}
+
+				@-webkit-keyframes opacity {
+					0% {opacity:1;}
+					100% {opacity:0;}
+				}
+
+				@-o-keyframes opacity {
+					0% {opacity:1;}
+					100% {opacity:0;}
+				}
+
+				@-moz-keyframes opacity {
+					0% {opacity:1;}
+					100% {opacity:0;}
+				}
+
+				@keyframes opacity {
+					0% {opacity:1;}
+					100% {opacity:0;}
+				}
+			}
 		}
 	}
 </style>

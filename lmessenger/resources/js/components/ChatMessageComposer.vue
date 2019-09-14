@@ -14,7 +14,7 @@
 				</label>
 				<input v-on:change.prevent="onInputFile" id="file" type="file" accept="image/jpeg,image/jpg,image/png">
 			</div>
-			<textarea id="msg-text" v-model="message" class="composer" placeholder="Написать..." @input="onInputText"></textarea>
+			<textarea id="msg-text" v-model="message" class="composer" placeholder="Написать..." @input="onInputText" @keydown="emitTypingEvent"></textarea>
 			<button id="btn-send" class="btn-send" @click.prevent="emitSendEvent">
 				<i class="fas fa-envelope fa-lg"></i>
 			</button>
@@ -67,19 +67,19 @@ export default {
 			this.updateTextArea(true);
 		},
 
+		emitTypingEvent() {
+			this.$emit('userTypingEvent');
+		},
+
 		updateTextArea(sent) {
 			const text = document.getElementById('msg-text');
 			text.style.height = 'auto';
-			text.style.height = (!sent) ? text.scrollHeight + 'px' : '50px';
+			text.style.height = (!sent) ? (text.scrollHeight - 7) + 'px' : '50px';
 			const container = document.getElementById('composer-wrapper');
 			container.style.height = 'auto';
 			container.style.height = (!sent) ? text.style.height : '50px';
 			container.style.alignItems = (!sent && text.scrollHeight > 60) ? 'flex-start' : 'center';
 		},
-
-		// emitTypingEvent() {
-		// 	this.$emit('userTypingEvent');
-		// },
 
 		onInputText(e) {
 			const btn = document.getElementById('btn-send');
@@ -208,7 +208,7 @@ export default {
 			display: flex;
 			justify-content: flex-start;
 			align-items: center;
-			padding: 12px 8px 8px 16px;
+			padding: 8px 8px 8px 16px;
 
 			.preview-container {
 				text-align: center;
@@ -241,7 +241,7 @@ export default {
 		.main-composer {
 			display: flex;
 			align-items: center;
-			max-height: 300px;
+			max-height: 200px;
 			background: $primaryBg;
 			box-shadow: 0 -1px 2px rgba($color: #000000, $alpha: 0.08);
 			z-index: 1;
@@ -252,7 +252,7 @@ export default {
 				max-height: inherit;
 				height: 50px;
 				overflow-y: hidden;
-				padding: 4px 4px 4px 8px;
+				padding: 8px 4px 4px 8px;
 				resize: none;
 				outline: none;
 				text-decoration: none;

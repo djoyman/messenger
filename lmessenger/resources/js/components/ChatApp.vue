@@ -1,8 +1,8 @@
 <template>
 	<div class="app-container">
-		<Navigation :user="user" :room="room" @userListClickEvent="openSideBar('users')" @settingsClickEvent="openSideBar('settings')" />
+		<Navigation :user="user" :room="room" :typing="typingUsers" @userListClickEvent="openSideBar('users')" @settingsClickEvent="openSideBar('settings')" />
 		<ChatMessageFeed @loadMoreMessages="getMessageHistory" @onPreviewClick="makePreview" :messages="chatMessages" :user="user" />
-		<ChatMessageComposer @sendEvent="onRegisterNewMessage" :users="chatUsers" />
+		<ChatMessageComposer @sendEvent="onRegisterNewMessage" @userTypingEvent="onTypingEvent" :users="chatUsers" />
 		<ChatUsers :users="chatUsers" />
 		<!-- <ChatSettings :user="user" /> -->
 		<div id="overlay" @click="hideSideBar" ></div>
@@ -44,6 +44,7 @@ export default {
 		return {
 			chatUsers: [],
 			chatMessages: [],
+			typingUsers: [],
 			messageText: '',
 			timerFlag: false,
 			page: 1,
@@ -60,26 +61,50 @@ export default {
 			.leaving( user => this.chatUsers = this.chatUsers.filter( value => value.id !== user.id ))
 
 			.listen( 'SendMessage', ({ data }) => {
-				this.chatMessages.push( data );
-				setTimeout(() => this.scrollToBottom(), 50);
+				this.chatMessages.unshift( data );
+				//setTimeout(() => this.scrollToBottom(), 50);
 			} )
-			// .listenForWhisper( 'typingEvent', ( e ) => {
+			.listenForWhisper( 'typingEvent', ( e ) => {
 
-			// 	if ( this.timerFlag ) clearTimeout( this.timerFlag );
+				const timerLen = 1000;
 				
-			// 	this.isUserTyping = true;
+				const user = {
+					id: e.id,
+					name: e.name,
+					timerId: null,
+				}
 
-			// 	const data = {
-			// 		name: e.name,
-			// 		typing: true 
-			// 	}
+				this.typingUsers.push(user);
+				this.typingUsers = this.typingUsers.reduce((acc, x) =>
+					acc.concat(acc.find(y => y.id === x.id) ? [] : [x]), []
+				);
 
-			// 	this.typingUsers = this.typingUsers.push(data).filter((v, i, a) => a.indexOf(v) === i);
+				this.typingUsers.forEach((v, i) => {
+					if (v.name === user.name){
+						if (v.timerId !== null) {
+							clearTimeout( v.timerId );
+							v.timerId = setTimeout( () => {
+								this.typingUsers.splice(i, 1);
+							}, timerLen );
+						} else {
+							v.timerId = setTimeout( () => { 
+								this.typingUsers.splice(i, 1); 
+							}, timerLen );
+						}
+					}
+				});
 
-			// 	console.log(this.typingUsers);
+			} );
 
-			// 	this.timerFlag = setTimeout( () => this.isUserTyping = false, 20000 );
-			// } );
+		// window.Echo.connector.socket.on('connect', function(){
+		// 	console.log('connected', window.Echo.socketId());
+		// });
+		// window.Echo.connector.socket.on('disconnect', function(){
+		// 	console.log('disconnected');
+		// });
+		// window.Echo.connector.socket.on('reconnecting', function(attemptNumber){
+		// 	console.log('reconnecting', attemptNumber);
+		// });
 	},
 
 	computed: {
@@ -127,19 +152,20 @@ export default {
 					alert('Too many attempts! Stop spamming');
 					return;
 				}
-				this.chatMessages.push( msg );
+				this.chatMessages.unshift( msg );
 				this.messageText = '';
-				setTimeout(() => this.scrollToBottom(), 50);
+				//setTimeout(() => this.scrollToBottom(), 50);
 			} )
 			.catch( err => console.log( err ) );
 
 		},
 
-		// onTypingEvent() {
-		// 	this.channel.whisper('typingEvent', {
-		// 		name: this.user.name,
-		// 	});
-		// },
+		onTypingEvent() {
+			this.channel.whisper('typingEvent', {
+				id: this.user.id,
+				name: this.user.name,
+			});
+		},
 
 		getMessageHistory($state) {
 			fetch(`../api/messages/history/${this.room.id}?api_token=${this.token}&page=${this.page}`, {
@@ -169,7 +195,8 @@ export default {
 
 		scrollToBottom() {
 			const div = document.getElementById('msg-scroll');
-			div.scrollTop = div.scrollHeight;
+			//div.scrollTop = div.scrollHeight;
+			window.scrollTo(0,document.body.scrollHeight);
 		},
 
 		openSideBar(bar) {
@@ -190,20 +217,9 @@ export default {
 			container.style.display = 'flex';
 
 			const img = document.getElementById('img-src');
-			img.onload = function() {
-				if (img.naturalWidth >= img.naturalHeight) {
-					console.log(img.naturalWidth, img.naturalHeight, 'more');
-					img.style.width = '100%';
-					img.style.height = 'auto';
-				} else {
-					console.log(img.naturalWidth, img.naturalHeight, 'less');
-					img.style.width = 'auto';
-					img.style.height = '100%';
-				}
-			}
-
+			img.style.maxWidth = '100%';
+			img.style.maxHeight = '100%';
 			img.src = src;
-			img.style.width = '100%';
 			
 			const btn = document.getElementById('preview-close');
 			btn.addEventListener('click', function() {

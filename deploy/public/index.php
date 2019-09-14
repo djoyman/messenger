@@ -21,7 +21,7 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
-require __DIR__.'/../app_messenger/vendor/autoload.php';
+require __DIR__.'/../messenger/vendor/autoload.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +35,7 @@ require __DIR__.'/../app_messenger/vendor/autoload.php';
 |
 */
 
-$app = require_once __DIR__.'/../app_messenger/bootstrap/app.php';
+$app = require_once __DIR__.'/../messenger/bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------

@@ -1,5 +1,13 @@
 <template>
 	<div id="msg-scroll" class="feed">
+		<div v-for="message in chatMessages" :key="message.id" class="message">
+			<div class="content">
+				<p class="name">{{ message.name }} <span class="date">{{ message.date }}</span></p>
+				<p class="text">{{ message.content }}</p>
+				<img class="image" onerror="this.onerror=null;this.src='/images/blank.jpg';" @click.prevent="openPreview(message.attachment)" v-if="message.attachment.length > 0" :src="`${ message.attachment }`">
+				<hr class="break">
+			</div>
+		</div>
 		<infinite-loading @infinite="infiniteHandler" direction="top" spinner="spiral">
 			<div class="inf-style" slot="no-more">Начало истории чата</div>
 			<div class="inf-style" slot="no-results">Сообщений нет</div>
@@ -7,14 +15,6 @@
 				Ошибка загрузки <br><button @click="trigger">Повторить</button>
 			</div>
 		</infinite-loading>
-		<div v-for="message in chatMessages" :key="message.id" class="message">
-			<div class="content">
-				<p class="name">{{ message.name }} <span class="date">{{ message.date }}</span></p>
-				<p class="text">{{ message.content }}</p>
-				<img class="image" @click.prevent="openPreview(message.attachment)" v-if="message.attachment.length > 0" :src="`${ message.attachment }`">
-				<hr class="break">
-			</div>
-		</div>
 	</div>
 </template>
 
@@ -73,12 +73,15 @@ export default {
 		color: #FFF;
 		overflow-y: scroll;
 		padding-bottom: 8px;
-		padding-top: 8px;
 		margin-top: 60px;
+		display: flex;
+		flex-direction: column-reverse;
+		height: 100%;
 
 		.inf-style {
 			font-size: 12px;
 			color: #7b7b7b;
+			padding-top: 8px;
 		}
 
 		.message {
@@ -98,6 +101,7 @@ export default {
 				.name {
 					font-size: 14px;
 					margin-bottom: 0;
+					color: #ececec;
 				}
 
 				.date {
@@ -109,8 +113,6 @@ export default {
 					width: 300px;
 					margin-top: 12px;
 					padding: 6px;
-					//border: 1px solid #fff;
-					//border-radius: 5px;
 				}
 
 				.break {

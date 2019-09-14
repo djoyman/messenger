@@ -1,7 +1,7 @@
 <template>
 	<div class="login-container">
 		<a class="login" :href="`${route}/vkontakte`">
-			<img class="img" src="/chat/images/logos/vk.png">
+			<img class="img" src="/images/logos/vk.png">
 			<h2 class="text">Вход ВКонтакте</h2>
 		</a>
 	</div>

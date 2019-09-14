@@ -40,7 +40,7 @@ class MessageController extends Controller
 		$currentPage = Paginator::resolveCurrentPage();
 		$perPage = 50;
 
-		$messages = array_reverse($messages);
+		//$messages = array_reverse($messages);
 
 		$currentMessages = array_slice($messages, $perPage * ($currentPage - 1), $perPage);
 
@@ -61,7 +61,7 @@ class MessageController extends Controller
 
 				Image::make($urlData)->save($path);
 
-				$link = '/chat/images/' . $fileName; // production
+				$link = '/images/' . $fileName; // production
 				//$link = '/storage/uploads/images/' . $fileName; // dev
 			}
 		}
