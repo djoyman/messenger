@@ -76,10 +76,10 @@ class LoginController extends Controller
      */
     public function handleVkProviderCallback()
     {
-        try {
+		try {
             $user = Socialite::driver('vkontakte')->user();
-        } catch (Exception $e) {
-			return redirect('/login');
+        } catch (\Exception $e) {
+			return redirect()->to('/login');
 		}
 		
 		$existingUser = User::where('social_id', $user->id)->first();
