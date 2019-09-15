@@ -66,20 +66,22 @@ export default {
 			.listenForWhisper( 'typingEvent', ( e ) => {
 
 				const timerLen = 1000;
+
+				if (e.id === this.user.id) return;
 				
-				const user = {
+				const userObj = {
 					id: e.id,
 					name: e.name,
 					timerId: null,
 				}
 
-				this.typingUsers.push(user);
+				this.typingUsers.push(userObj);
 				this.typingUsers = this.typingUsers.reduce((acc, x) =>
 					acc.concat(acc.find(y => y.id === x.id) ? [] : [x]), []
 				);
 
 				this.typingUsers.forEach((v, i) => {
-					if (v.name === user.name){
+					if (v.name === userObj.name){
 						if (v.timerId !== null) {
 							clearTimeout( v.timerId );
 							v.timerId = setTimeout( () => {
