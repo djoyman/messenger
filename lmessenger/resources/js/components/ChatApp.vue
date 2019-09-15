@@ -1,7 +1,7 @@
 <template>
 	<div class="app-container">
 		<Navigation :user="user" :room="room" :typing="typingUsers" @userListClickEvent="openSideBar('users')" @settingsClickEvent="openSideBar('settings')" />
-		<ChatMessageFeed @loadMoreMessages="getMessageHistory" @onPreviewClick="makePreview" :messages="chatMessages" :user="user" />
+		<ChatMessageFeed @loadMoreMessages="getMessageHistory" @onPreviewClick="makePreview" @scrollBottomEvent="scrollToBottom" :messages="chatMessages" :user="user" />
 		<ChatMessageComposer @sendEvent="onRegisterNewMessage" @userTypingEvent="onTypingEvent" :users="chatUsers" />
 		<ChatUsers :users="chatUsers" />
 		<!-- <ChatSettings :user="user" /> -->
@@ -61,8 +61,7 @@ export default {
 			.leaving( user => this.chatUsers = this.chatUsers.filter( value => value.id !== user.id ))
 
 			.listen( 'SendMessage', ({ data }) => {
-				this.chatMessages.unshift( data );
-				//setTimeout(() => this.scrollToBottom(), 50);
+				this.chatMessages.push( data );
 			} )
 			.listenForWhisper( 'typingEvent', ( e ) => {
 
@@ -96,6 +95,8 @@ export default {
 
 			} );
 
+		setTimeout(() => this.scrollToBottom(), 50 );
+
 		// window.Echo.connector.socket.on('connect', function(){
 		// 	console.log('connected', window.Echo.socketId());
 		// });
@@ -111,16 +112,6 @@ export default {
 		channel() {
 			return window.Echo.join('chat_room.' + this.room.id);
 		},
-
-		getDateString() {
-			const date = new Date();
-			const day = (date.getDate() < 10) ? '0' + date.getDate() : date.getDate();
-			const month = (date.getMonth() + 1 < 10) ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-			const hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours();
-			const minutes = (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes();
-
-			return `${ day }.${ month }.${ date.getFullYear() } ${ hours }:${ minutes }`;
-		}
 	},
 
 	methods: {
@@ -129,7 +120,7 @@ export default {
 			this.messageText = msgData.message;
 			
 			const msg = {
-				'date': this.getDateString,
+				'date': this.getDateString(),
 				'name': this.user.name,
 				'content': this.messageText,
 				'from': this.user.id,
@@ -152,11 +143,14 @@ export default {
 					alert('Too many attempts! Stop spamming');
 					return;
 				}
-				this.chatMessages.unshift( msg );
+				this.chatMessages.push( msg );
 				this.messageText = '';
-				//setTimeout(() => this.scrollToBottom(), 50);
+				setTimeout(() => this.scrollToBottom(), 0);
 			} )
-			.catch( err => console.log( err ) );
+			.catch( err => {
+				console.log( err );
+				alert('Unable to send message!');
+			} );
 
 		},
 
@@ -195,8 +189,7 @@ export default {
 
 		scrollToBottom() {
 			const div = document.getElementById('msg-scroll');
-			//div.scrollTop = div.scrollHeight;
-			window.scrollTo(0,document.body.scrollHeight);
+			div.scrollTop = div.scrollHeight;
 		},
 
 		openSideBar(bar) {
@@ -306,6 +299,16 @@ export default {
 					el.style.webkitTransform = transform;
 				}
 			});
+		},
+
+		getDateString() {
+			const date = new Date();
+			const day = (date.getDate() < 10) ? '0' + date.getDate() : date.getDate();
+			const month = (date.getMonth() + 1 < 10) ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+			const hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours();
+			const minutes = (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes();
+
+			return `${ day }.${ month }.${ date.getFullYear() } ${ hours }:${ minutes }`;
 		}
 	},
 

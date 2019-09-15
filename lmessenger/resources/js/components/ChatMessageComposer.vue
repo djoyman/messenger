@@ -35,7 +35,11 @@ export default {
 		return {
 			message: '',
 			isImageAppended: false,
-			imageData: '',
+			imageData: {
+				source: '',
+				width: 0,
+				height: 0
+			},
 		}
 	},
 
@@ -51,7 +55,7 @@ export default {
 	methods: {
 		emitSendEvent() {			
 			if ( this.message === '' ) {
-				if (this.imageData === '') {
+				if (this.imageData.source === '') {
 					return;
 				}
 			}
@@ -163,7 +167,11 @@ export default {
 
 				dataURL = canvas.toDataURL(fileType);
 
-				this.imageData = dataURL;
+				this.imageData = {
+					source: dataURL,
+					width: width,
+					height: height, 
+				};
 			};
 
 			image.onerror = () =>
@@ -183,7 +191,11 @@ export default {
 			document.getElementById('file').value = '';
 			document.getElementById('btn-send').className = 'btn-send';
 			this.isImageAppended = false;
-			this.imageData = '';
+			this.imageData = {
+				source: '',
+				width: 0,
+				height: 0, 
+			};;
 		}
 	},
 

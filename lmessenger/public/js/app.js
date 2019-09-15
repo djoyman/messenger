@@ -1880,8 +1880,7 @@ __webpack_require__.r(__webpack_exports__);
     }).listen('SendMessage', function (_ref) {
       var data = _ref.data;
 
-      _this.chatMessages.unshift(data); //setTimeout(() => this.scrollToBottom(), 50);
-
+      _this.chatMessages.push(data);
     }).listenForWhisper('typingEvent', function (e) {
       var timerLen = 1000;
       var user = {
@@ -1912,7 +1911,10 @@ __webpack_require__.r(__webpack_exports__);
           }
         }
       });
-    }); // window.Echo.connector.socket.on('connect', function(){
+    });
+    Object(timers__WEBPACK_IMPORTED_MODULE_6__["setTimeout"])(function () {
+      return _this.scrollToBottom();
+    }, 50); // window.Echo.connector.socket.on('connect', function(){
     // 	console.log('connected', window.Echo.socketId());
     // });
     // window.Echo.connector.socket.on('disconnect', function(){
@@ -1925,14 +1927,6 @@ __webpack_require__.r(__webpack_exports__);
   computed: {
     channel: function channel() {
       return window.Echo.join('chat_room.' + this.room.id);
-    },
-    getDateString: function getDateString() {
-      var date = new Date();
-      var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
-      var month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-      var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-      var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-      return "".concat(day, ".").concat(month, ".").concat(date.getFullYear(), " ").concat(hours, ":").concat(minutes);
     }
   },
   methods: {
@@ -1941,7 +1935,7 @@ __webpack_require__.r(__webpack_exports__);
 
       this.messageText = msgData.message;
       var msg = {
-        'date': this.getDateString,
+        'date': this.getDateString(),
         'name': this.user.name,
         'content': this.messageText,
         'from': this.user.id,
@@ -1963,11 +1957,15 @@ __webpack_require__.r(__webpack_exports__);
           return;
         }
 
-        _this2.chatMessages.unshift(msg);
+        _this2.chatMessages.push(msg);
 
-        _this2.messageText = ''; //setTimeout(() => this.scrollToBottom(), 50);
+        _this2.messageText = '';
+        Object(timers__WEBPACK_IMPORTED_MODULE_6__["setTimeout"])(function () {
+          return _this2.scrollToBottom();
+        }, 0);
       })["catch"](function (err) {
-        return console.log(err);
+        console.log(err);
+        alert('Unable to send message!');
       });
     },
     onTypingEvent: function onTypingEvent() {
@@ -2006,9 +2004,8 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     scrollToBottom: function scrollToBottom() {
-      var div = document.getElementById('msg-scroll'); //div.scrollTop = div.scrollHeight;
-
-      window.scrollTo(0, document.body.scrollHeight);
+      var div = document.getElementById('msg-scroll');
+      div.scrollTop = div.scrollHeight;
     },
     openSideBar: function openSideBar(bar) {
       document.getElementById(bar).style.width = '280px';
@@ -2112,6 +2109,14 @@ __webpack_require__.r(__webpack_exports__);
           el.style.webkitTransform = transform;
         }
       });
+    },
+    getDateString: function getDateString() {
+      var date = new Date();
+      var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+      var month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+      var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+      var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+      return "".concat(day, ".").concat(month, ".").concat(date.getFullYear(), " ").concat(hours, ":").concat(minutes);
     }
   },
   components: {
@@ -2169,7 +2174,11 @@ __webpack_require__.r(__webpack_exports__);
     return {
       message: '',
       isImageAppended: false,
-      imageData: ''
+      imageData: {
+        source: '',
+        width: 0,
+        height: 0
+      }
     };
   },
   computed: {
@@ -2184,7 +2193,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     emitSendEvent: function emitSendEvent() {
       if (this.message === '') {
-        if (this.imageData === '') {
+        if (this.imageData.source === '') {
           return;
         }
       }
@@ -2286,7 +2295,11 @@ __webpack_require__.r(__webpack_exports__);
         var context = canvas.getContext('2d');
         context.drawImage(image, 0, 0, width, height);
         dataURL = canvas.toDataURL(fileType);
-        _this2.imageData = dataURL;
+        _this2.imageData = {
+          source: dataURL,
+          width: width,
+          height: height
+        };
       };
 
       image.onerror = function () {
@@ -2303,7 +2316,12 @@ __webpack_require__.r(__webpack_exports__);
       document.getElementById('file').value = '';
       document.getElementById('btn-send').className = 'btn-send';
       this.isImageAppended = false;
-      this.imageData = '';
+      this.imageData = {
+        source: '',
+        width: 0,
+        height: 0
+      };
+      ;
     }
   }
 });
@@ -2341,6 +2359,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
@@ -2357,7 +2378,9 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       chatMessages: this.messages,
-      typingUsers: []
+      typingUsers: [],
+      lastScroll: 0,
+      btnPoint: false
     };
   },
   methods: {
@@ -2366,6 +2389,25 @@ __webpack_require__.r(__webpack_exports__);
     },
     openPreview: function openPreview(src) {
       this.$emit('onPreviewClick', src);
+    },
+    calcHeight: function calcHeight(width, height) {
+      return height * (200 / width);
+    },
+    onScrolling: function onScrolling() {
+      var div = document.getElementById('msg-scroll');
+      var btn = document.getElementById('btn-scroll');
+
+      if (div.scrollHeight - div.scrollTop > div.clientHeight + 200) {
+        btn.style.background = 'rgb(36, 53, 73)';
+        btn.style.opacity = '1';
+      } else {
+        btn.style.opacity = '0';
+      }
+    },
+    clickScrollBottom: function clickScrollBottom() {
+      this.$emit('scrollBottomEvent');
+      var btn = document.getElementById('btn-scroll');
+      btn.style.background = 'rgb(69, 95, 125)';
     }
   },
   components: {
@@ -9530,7 +9572,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "ul[data-v-7a4f2c9c] {\n  list-style-type: none;\n  padding: 0;\n}\nhr[data-v-7a4f2c9c] {\n  border-top: 1px solid rgba(79, 79, 79, 0.16);\n}\n.feed[data-v-7a4f2c9c] {\n  background: #192533;\n  color: #FFF;\n  overflow-y: scroll;\n  padding-bottom: 8px;\n  margin-top: 60px;\n  display: flex;\n  flex-direction: column-reverse;\n  height: 100%;\n}\n.feed .inf-style[data-v-7a4f2c9c] {\n  font-size: 12px;\n  color: #7b7b7b;\n  padding-top: 8px;\n}\n.feed .message[data-v-7a4f2c9c] {\n  padding: 8px 8px 0px 12px;\n  text-align: left;\n}\n.feed .message .content .text[data-v-7a4f2c9c] {\n  white-space: pre-line;\n  word-break: break-word;\n  margin-bottom: 0;\n  font-size: 14px;\n}\n.feed .message .content .name[data-v-7a4f2c9c] {\n  font-size: 14px;\n  margin-bottom: 0;\n  color: #ececec;\n}\n.feed .message .content .date[data-v-7a4f2c9c] {\n  font-size: 10px;\n  color: #7b7b7b;\n}\n.feed .message .content .image[data-v-7a4f2c9c] {\n  width: 300px;\n  margin-top: 12px;\n  padding: 6px;\n}\n.feed .message .content .break[data-v-7a4f2c9c] {\n  margin: 0;\n  margin-top: 8px;\n}", ""]);
+exports.push([module.i, "ul[data-v-7a4f2c9c] {\n  list-style-type: none;\n  padding: 0;\n}\nhr[data-v-7a4f2c9c] {\n  border-top: 1px solid rgba(79, 79, 79, 0.16);\n}\n.feed[data-v-7a4f2c9c] {\n  background: #192533;\n  color: #FFF;\n  overflow-y: scroll;\n  padding-bottom: 8px;\n  margin-top: 60px;\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n  position: relative;\n}\n.feed .inf-style[data-v-7a4f2c9c] {\n  font-size: 12px;\n  color: #7b7b7b;\n  padding-top: 8px;\n}\n.feed .message[data-v-7a4f2c9c] {\n  padding: 8px 8px 0px 12px;\n  text-align: left;\n}\n.feed .message .content .text[data-v-7a4f2c9c] {\n  white-space: pre-line;\n  word-break: break-word;\n  margin-bottom: 0;\n  font-size: 14px;\n}\n.feed .message .content .name[data-v-7a4f2c9c] {\n  font-size: 14px;\n  margin-bottom: 0;\n  color: #ececec;\n}\n.feed .message .content .date[data-v-7a4f2c9c] {\n  font-size: 10px;\n  color: #7b7b7b;\n}\n.feed .message .content .image[data-v-7a4f2c9c] {\n  width: 200px;\n  margin-top: 12px;\n  padding: 6px;\n}\n.feed .message .content .break[data-v-7a4f2c9c] {\n  margin: 0;\n  margin-top: 8px;\n}\n.feed .scroll-bottom[data-v-7a4f2c9c] {\n  border-radius: 50%;\n  border: none;\n  outline: none;\n  background: #243549;\n  width: 52px;\n  height: 52px;\n  position: fixed;\n  bottom: 72px;\n  right: 24px;\n  color: #fff;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  text-align: center;\n  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);\n  opacity: 0;\n  transition: opacity 300ms ease-out;\n}", ""]);
 
 // exports
 
@@ -51265,7 +51307,8 @@ var render = function() {
         attrs: { messages: _vm.chatMessages, user: _vm.user },
         on: {
           loadMoreMessages: _vm.getMessageHistory,
-          onPreviewClick: _vm.makePreview
+          onPreviewClick: _vm.makePreview,
+          scrollBottomEvent: _vm.scrollToBottom
         }
       }),
       _vm._v(" "),
@@ -51453,41 +51496,12 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "feed", attrs: { id: "msg-scroll" } },
+    {
+      staticClass: "feed",
+      attrs: { id: "msg-scroll" },
+      on: { scroll: _vm.onScrolling }
+    },
     [
-      _vm._l(_vm.chatMessages, function(message) {
-        return _c("div", { key: message.id, staticClass: "message" }, [
-          _c("div", { staticClass: "content" }, [
-            _c("p", { staticClass: "name" }, [
-              _vm._v(_vm._s(message.name) + " "),
-              _c("span", { staticClass: "date" }, [
-                _vm._v(_vm._s(message.date))
-              ])
-            ]),
-            _vm._v(" "),
-            _c("p", { staticClass: "text" }, [_vm._v(_vm._s(message.content))]),
-            _vm._v(" "),
-            message.attachment.length > 0
-              ? _c("img", {
-                  staticClass: "image",
-                  attrs: {
-                    onerror: "this.onerror=null;this.src='/images/blank.jpg';",
-                    src: "" + message.attachment
-                  },
-                  on: {
-                    click: function($event) {
-                      $event.preventDefault()
-                      return _vm.openPreview(message.attachment)
-                    }
-                  }
-                })
-              : _vm._e(),
-            _vm._v(" "),
-            _c("hr", { staticClass: "break" })
-          ])
-        ])
-      }),
-      _vm._v(" "),
       _c(
         "infinite-loading",
         {
@@ -51530,6 +51544,62 @@ var render = function() {
             [_vm._v("Сообщений нет")]
           )
         ]
+      ),
+      _vm._v(" "),
+      _vm._l(_vm.chatMessages, function(message) {
+        return _c("div", { key: message.id, staticClass: "message" }, [
+          _c("div", { staticClass: "content" }, [
+            _c("p", { staticClass: "name" }, [
+              _vm._v(_vm._s(message.name) + " "),
+              _c("span", { staticClass: "date" }, [
+                _vm._v(_vm._s(message.date))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "text" }, [_vm._v(_vm._s(message.content))]),
+            _vm._v(" "),
+            message.attachment.source.length > 0
+              ? _c("img", {
+                  staticClass: "image",
+                  attrs: {
+                    src: "" + message.attachment.source,
+                    width: "200",
+                    height:
+                      "" +
+                      _vm.calcHeight(
+                        message.attachment.width,
+                        message.attachment.height
+                      ),
+                    onerror: "this.onerror=null;this.src='/images/blank.jpg';",
+                    loading: "lazy"
+                  },
+                  on: {
+                    click: function($event) {
+                      $event.preventDefault()
+                      return _vm.openPreview(message.attachment.source)
+                    }
+                  }
+                })
+              : _vm._e(),
+            _vm._v(" "),
+            _c("hr", { staticClass: "break" })
+          ])
+        ])
+      }),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "scroll-bottom",
+          attrs: { id: "btn-scroll" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              return _vm.clickScrollBottom($event)
+            }
+          }
+        },
+        [_c("i", { staticClass: "fas fa-arrow-down fa-lg" })]
       )
     ],
     2
