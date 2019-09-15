@@ -74,7 +74,8 @@ export default {
 			this.$emit('scrollBottomEvent');
 			const btn = document.getElementById('btn-scroll');
 			btn.style.background = 'rgb(69, 95, 125)';
-		}
+		},
+
 	},
 
 	components: {

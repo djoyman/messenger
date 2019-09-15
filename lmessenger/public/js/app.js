@@ -2219,14 +2219,18 @@ __webpack_require__.r(__webpack_exports__);
       container.style.height = !sent ? text.style.height : '50px';
       container.style.alignItems = !sent && text.scrollHeight > 60 ? 'flex-start' : 'center';
     },
+    setSendBtnColor: function setSendBtnColor(bright) {
+      var btn = document.getElementById('svg-object-send-btn').contentDocument.getElementById('svg-send-btn');
+      btn.style.fill = bright ? 'rgb(64, 212, 235)' : 'rgb(40, 51, 64)';
+    },
     onInputText: function onInputText(e) {
       var btn = document.getElementById('btn-send');
       var textarea = document.getElementById('msg-text');
 
       if (textarea.value.length > 0) {
-        btn.className = 'btn-send bright';
+        this.setSendBtnColor(true);
       } else {
-        btn.className = 'btn-send';
+        this.setSendBtnColor(false);
       }
 
       this.updateTextArea(false);
@@ -2234,7 +2238,7 @@ __webpack_require__.r(__webpack_exports__);
     onInputFile: function onInputFile(event) {
       if (window.File && window.FileReader && window.FormData) {
         var file = event.target.files[0];
-        document.getElementById('btn-send').className = 'btn-send bright';
+        this.setSendBtnColor(true);
 
         if (file) {
           if (/^image\//i.test(file.type)) {
@@ -2314,7 +2318,7 @@ __webpack_require__.r(__webpack_exports__);
       context.clearRect(0, 0, canvas.width, canvas.height);
       document.getElementById('preview').src = '#';
       document.getElementById('file').value = '';
-      document.getElementById('btn-send').className = 'btn-send';
+      this.setSendBtnColor(false);
       this.isImageAppended = false;
       this.imageData = {
         source: '',
@@ -9553,7 +9557,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".message-composer[data-v-5e9d1634] {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: stretch;\n}\n.message-composer .image-preview[data-v-5e9d1634] {\n  background: #131d29;\n  height: 120px;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  padding: 8px 8px 8px 16px;\n}\n.message-composer .image-preview .preview-container[data-v-5e9d1634] {\n  text-align: center;\n  position: relative;\n}\n.message-composer .image-preview .preview-container #btn-remove-img[data-v-5e9d1634] {\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  right: 0;\n  top: 0;\n  background: #000;\n  color: #fff;\n  border: none;\n  border-radius: 50%;\n  outline: none;\n}\n.message-composer .image-preview .preview-container #preview[data-v-5e9d1634] {\n  height: 80px;\n  border-radius: 5px;\n}\n.message-composer .hidden[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer[data-v-5e9d1634] {\n  display: flex;\n  align-items: center;\n  max-height: 200px;\n  background: #192533;\n  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.08);\n  z-index: 1;\n  position: relative;\n}\n.message-composer .main-composer .composer[data-v-5e9d1634] {\n  width: calc(100% - 120px);\n  max-height: inherit;\n  height: 50px;\n  overflow-y: hidden;\n  padding: 8px 4px 4px 8px;\n  resize: none;\n  outline: none;\n  text-decoration: none;\n  background: #192533;\n  color: #fff;\n  border: none;\n}\n.message-composer .main-composer .image-upload[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-right: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n  display: flex;\n  text-align: center;\n  justify-content: center;\n  align-items: center;\n}\n.message-composer .main-composer .image-upload label[data-v-5e9d1634] {\n  margin: 0;\n}\n.message-composer .main-composer .image-upload #file[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer .btn-send[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-left: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n}\n.message-composer .main-composer .btn-send.bright[data-v-5e9d1634] {\n  color: #40d4eb;\n}", ""]);
+exports.push([module.i, ".message-composer[data-v-5e9d1634] {\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: stretch;\n}\n.message-composer .image-preview[data-v-5e9d1634] {\n  background: #131d29;\n  height: 120px;\n  display: flex;\n  justify-content: flex-start;\n  align-items: center;\n  padding: 8px 8px 8px 16px;\n}\n.message-composer .image-preview .preview-container[data-v-5e9d1634] {\n  text-align: center;\n  position: relative;\n}\n.message-composer .image-preview .preview-container #btn-remove-img[data-v-5e9d1634] {\n  position: absolute;\n  width: 22px;\n  height: 22px;\n  right: 0;\n  top: 0;\n  background: #000;\n  color: #fff;\n  border: none;\n  border-radius: 50%;\n  outline: none;\n}\n.message-composer .image-preview .preview-container #preview[data-v-5e9d1634] {\n  height: 80px;\n  border-radius: 5px;\n}\n.message-composer .hidden[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer[data-v-5e9d1634] {\n  display: flex;\n  align-items: center;\n  max-height: 200px;\n  background: #192533;\n  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.08);\n  z-index: 1;\n  position: relative;\n}\n.message-composer .main-composer .composer[data-v-5e9d1634] {\n  width: calc(100% - 120px);\n  max-height: inherit;\n  height: 50px;\n  overflow-y: hidden;\n  padding: 8px 4px 4px 8px;\n  resize: none;\n  outline: none;\n  text-decoration: none;\n  background: #192533;\n  color: #fff;\n  border: none;\n}\n.message-composer .main-composer .image-upload[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-right: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n  display: flex;\n  text-align: center;\n  justify-content: center;\n  align-items: center;\n}\n.message-composer .main-composer .image-upload label[data-v-5e9d1634] {\n  margin: 0;\n}\n.message-composer .main-composer .image-upload #file[data-v-5e9d1634] {\n  display: none;\n}\n.message-composer .main-composer .btn-send[data-v-5e9d1634] {\n  width: 60px;\n  background: #192533;\n  color: #283340;\n  border: none;\n  border-left: 1px #283340 solid;\n  padding: 4px;\n  margin: 4px 0;\n  outline: none;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}", ""]);
 
 // exports
 
@@ -51457,7 +51461,16 @@ var render = function() {
               }
             }
           },
-          [_c("i", { staticClass: "fas fa-envelope fa-lg" })]
+          [
+            _c("object", {
+              attrs: {
+                id: "svg-object-send-btn",
+                type: "image/svg+xml",
+                data: "/images/icons/paper_plane.svg",
+                width: "26"
+              }
+            })
+          ]
         )
       ]
     )

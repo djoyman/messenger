@@ -16,7 +16,7 @@
 			</div>
 			<textarea id="msg-text" v-model="message" class="composer" placeholder="Написать..." @input="onInputText" @keydown="emitTypingEvent"></textarea>
 			<button id="btn-send" class="btn-send" @click.prevent="emitSendEvent">
-				<i class="fas fa-envelope fa-lg"></i>
+				<object id="svg-object-send-btn" type="image/svg+xml" data="/images/icons/paper_plane.svg" width="26"></object>
 			</button>
 		</div>
 	</div>
@@ -85,13 +85,18 @@ export default {
 			container.style.alignItems = (!sent && text.scrollHeight > 60) ? 'flex-start' : 'center';
 		},
 
+		setSendBtnColor(bright) {
+			const btn = document.getElementById('svg-object-send-btn').contentDocument.getElementById('svg-send-btn');
+			btn.style.fill = (bright) ? 'rgb(64, 212, 235)' : 'rgb(40, 51, 64)';
+		},
+
 		onInputText(e) {
 			const btn = document.getElementById('btn-send');
 			const textarea = document.getElementById('msg-text');
 			if (textarea.value.length > 0) {
-				btn.className = 'btn-send bright';
+				this.setSendBtnColor(true);
 			} else {
-				btn.className = 'btn-send';
+				this.setSendBtnColor(false);
 			}
 
 			this.updateTextArea(false);
@@ -103,7 +108,7 @@ export default {
 
 				const file = event.target.files[0];
 
-				document.getElementById('btn-send').className = 'btn-send bright';
+				this.setSendBtnColor(true);
 
 				if (file) {
 					if (/^image\//i.test(file.type)) {
@@ -189,7 +194,7 @@ export default {
 
 			document.getElementById('preview').src = '#';
 			document.getElementById('file').value = '';
-			document.getElementById('btn-send').className = 'btn-send';
+			this.setSendBtnColor(false);
 			this.isImageAppended = false;
 			this.imageData = {
 				source: '',
@@ -305,10 +310,9 @@ export default {
 				padding: 4px;
 				margin: 4px 0;
 				outline: none;
-
-				&.bright {
-					color: rgb(64, 212, 235);
-				}
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		}
 	}
