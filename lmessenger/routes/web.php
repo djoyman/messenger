@@ -29,3 +29,5 @@ Route::get('/access/{id}', 'Auth\LoginController@access');
 
 Route::get('login/{service}', 'Auth\LoginController@redirectToProvider');
 Route::get('login/vkontakte/callback', 'Auth\LoginController@handleVkProviderCallback');
+
+Route::get('/banned', 'Auth\LoginController@logout');

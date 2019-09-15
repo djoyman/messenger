@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Str;
 use Socialite;
 use App\User;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Cookie;
 use Hash;
 
@@ -45,6 +45,11 @@ class LoginController extends Controller
 
 	public function username() {
 		return 'social_id';
+	}
+
+	public function logout() {
+		Auth::logout();
+		return redirect()->to('/login');
 	}
 
 	public function access($id) {
@@ -86,6 +91,11 @@ class LoginController extends Controller
 		
 		if($existingUser !== null){
 			// log them in
+			if ($existingUser->banned === 1) {
+				Auth::logout();
+				return redirect()->to('/login');
+			}
+
             Auth::login($existingUser, true);
         } else {
             // create a new user

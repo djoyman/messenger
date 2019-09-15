@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Events\SendMessage;
 use App\Message;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
@@ -20,6 +21,10 @@ class MessageController extends Controller
 	
 	public function send( Request $request ) {
 
+		if (Auth::user()->banned === 1) {
+			return redirect()->to('/banned');
+		}
+		
 		$data = $request->getContent();
 
 		$result = Message::create( json_decode($data, true) );

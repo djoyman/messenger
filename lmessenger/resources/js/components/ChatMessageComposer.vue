@@ -286,6 +286,7 @@ export default {
 				border-right: 1px $iconColor solid;
 				padding: 4px;
 				margin: 4px 0;
+				height: 34px;
 				outline: none;
 				display: flex;
 				text-align: center;
@@ -313,6 +314,10 @@ export default {
 				display: flex;
 				justify-content: center;
 				align-items: center;
+			}
+
+			.btn-send > * {
+				pointer-events: none;
 			}
 		}
 	}
