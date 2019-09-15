@@ -9,7 +9,7 @@
 		</infinite-loading>
 		<div v-for="message in chatMessages" :key="message.id" class="message">
 			<div class="content">
-				<p class="name">{{ message.name }} <span class="date">{{ message.date }}</span></p>
+				<p class="name">{{ message.name }} <span class="date">{{ getDateString(message.date) }}</span></p>
 				<p class="text">{{ message.content }}</p>
 				<img class="image" v-if="message.attachment.source.length > 0" @click.prevent="openPreview(message.attachment.source)" :src="`${ message.attachment.source }`" width="200" :height="`${ calcHeight(message.attachment.width, message.attachment.height) }`" onerror="this.onerror=null;this.src='/images/blank.jpg';" loading="lazy">
 				<hr class="break">
@@ -75,6 +75,17 @@ export default {
 			const btn = document.getElementById('btn-scroll');
 			btn.style.background = 'rgb(69, 95, 125)';
 		},
+
+		getDateString(timestamp) {
+			const date = new Date(parseInt(timestamp));
+
+			const day = (date.getDate() < 10) ? `0${date.getDate()}` : date.getDate();
+			const month = (date.getMonth() + 1 < 10) ? `0${(date.getMonth() + 1)}` : date.getMonth() + 1;
+			const hours = (date.getHours() < 10) ? `0${date.getHours()}` : date.getHours();
+			const minutes = (date.getMinutes() < 10) ? `0${date.getMinutes()}` : date.getMinutes();
+
+			return `${ day }.${ month }.${ date.getFullYear() } ${ hours }:${ minutes }`;
+		}
 
 	},
 

@@ -122,7 +122,7 @@ export default {
 			this.messageText = msgData.message;
 			
 			const msg = {
-				'date': this.getDateString(),
+				'date': new Date().getTime(),
 				'name': this.user.name,
 				'content': this.messageText,
 				'from': this.user.id,
@@ -302,17 +302,6 @@ export default {
 				}
 			});
 		},
-
-		getDateString() {
-			const date = new Date();
-			const time_zone = (('<? echo time();?>' - loc/1000)/60).toFixed(0);
-			const day = (date.getDate() < 10) ? '0' + date.getDate() : date.getDate();
-			const month = (date.getMonth() + 1 < 10) ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
-			const hours = (date.getHours() < 10) ? '0' + date.getHours() : date.getHours();
-			const minutes = (date.getMinutes() < 10) ? '0' + date.getMinutes() : date.getMinutes();
-
-			return `${ day }.${ month }.${ date.getFullYear() } ${ hours }:${ minutes }`;
-		}
 	},
 
 	components: {
