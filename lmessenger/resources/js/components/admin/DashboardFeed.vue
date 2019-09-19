@@ -1,6 +1,6 @@
 <template>
 	<div id="msg-scroll" class="feed" @scroll="onScrolling">
-		<infinite-loading @infinite="infiniteHandler" direction="top" spinner="spiral">
+		<infinite-loading @infinite="infiniteHandler" direction="top" spinner="spiral" :identifier="identifier">
 			<div class="inf-style" slot="no-more">Начало истории чата</div>
 			<div class="inf-style" slot="no-results">Сообщений нет</div>
 			<div class="inf-style" slot="error" slot-scope="{ trigger }">
@@ -9,7 +9,7 @@
 		</infinite-loading>
 		<div v-for="message in chatMessages" :key="message.id" class="message">
 			<div class="content">
-				<p class="name">{{ message.name }} <span class="date">{{ getDateString(message.date) }}</span></p>
+				<p @click="openOptions(message)" class="name">{{ message.name }} <span class="date">{{ getDateString(message.date) }} </span><span class="user-id">ID: {{ message.from }}</span></p>
 				<p class="text">{{ message.content }}</p>
 				<img class="image" v-if="message['attachment:source'].length > 0" @click.prevent="openPreview(message.attachment.source)" :src="`${ message['attachment:source'] }`" width="200" :height="`${ calcHeight(message['attachment:width'], message['attachment:height']) }`" onerror="this.onerror=null;this.src='/images/blank.jpg';" loading="lazy">
 				<hr class="break">
@@ -31,6 +31,10 @@ export default {
 			default: [],
 			required: true
 		},
+		identifier: {
+			type: Number,
+			required: true
+		}
 	},
 
 	data() {
@@ -44,10 +48,6 @@ export default {
 	methods: {
 		infiniteHandler($state) {
 			this.$emit('loadMoreMessages', $state);
-		},
-
-		openPreview(src) {
-			this.$emit('onPreviewClick', src);
 		},
 
 		calcHeight(width, height) {
@@ -80,8 +80,11 @@ export default {
 			const minutes = (date.getMinutes() < 10) ? `0${date.getMinutes()}` : date.getMinutes();
 
 			return `${ day }.${ month }.${ date.getFullYear() } ${ hours }:${ minutes }`;
-		}
+		},
 
+		openOptions(message) {
+			this.$emit('optionsEvent', message);
+		}
 	},
 
 	components: {
@@ -106,10 +109,11 @@ export default {
 		color: #FFF;
 		overflow-y: scroll;
 		padding-bottom: 8px;
-		margin-top: 60px;
+		margin-top: 16px;
 		display: flex;
 		flex-direction: column;
-		height: 100%;
+		height: 100vh;
+		width: 100vw;
 		position: relative;
 
 		.inf-style {
@@ -141,6 +145,11 @@ export default {
 				.date {
 					font-size: 10px;
 					color: #7b7b7b;
+				}
+
+				.user-id {
+					font-size: 16px;
+					color: #20b6df;
 				}
 
 				.image {

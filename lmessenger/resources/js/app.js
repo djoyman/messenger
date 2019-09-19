@@ -32,6 +32,7 @@ const router = new VueRouter({
 Vue.component('chat-app', require('./components/ChatApp.vue').default);
 Vue.component('chat-login', require('./components/auth/Login.vue').default);
 Vue.component('api-token', require('./components/ApiToken.vue').default);
+Vue.component('admin-dashboard', require('./components/admin/Dashboard.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

@@ -38,18 +38,21 @@ class Message extends Model
 					$hashKey = 'conversation:room:' . $data['room_id'] . $min[0];
 
 					
-					if ($data['attachment'] !== '')
-						$data['attachment'] = Message::saveImgOnServer($data['attachment']);
+					if ($data['attachment:source'] !== '')
+						$data['attachment:source'] = Message::saveImgOnServer($data['attachment:source']);
 
 					$values = array(
 						'date' => $data['date'], 
 						'name' => $data['name'],
 						'content' => $data['content'],
 						'from' => $data['from'],
+						'history_order' => $min[0],
 						'room_id' => $data['room_id'],
-						'attachment' => json_encode($data['attachment'])
+						'attachment:source' => $data['attachment:source'],
+						'attachment:width' => $data['attachment:width'],
+						'attachment:height'=> $data['attachment:height']
 					);
-	
+
 					Redis::hmset($hashKey, $values);
 
 					return $values;
@@ -69,16 +72,19 @@ class Message extends Model
 			
 				$hashKey = 'conversation:room:' . $data['room_id'] . $setValue;
 
-				if ($data['attachment']['source'] !== '')
-					$data['attachment']['source'] = Message::saveImgOnServer($data['attachment']['source']);
+				if ($data['attachment:source'] !== '')
+					$data['attachment:source'] = Message::saveImgOnServer($data['attachment:source']);
 				
 				$values = array(
 					'date' => $data['date'], 
 					'name' => $data['name'],
 					'content' => $data['content'],
 					'from' => $data['from'],
+					'history_order' => $setValue,
 					'room_id' => $data['room_id'],
-					'attachment' => json_encode($data['attachment'])
+					'attachment:source' => $data['attachment:source'],
+					'attachment:width' => $data['attachment:width'],
+					'attachment:height'=> $data['attachment:height']
 				);
 
 				Redis::hmset($hashKey, $values);
@@ -107,14 +113,39 @@ class Message extends Model
 		foreach($valuesFromSet as $msg) {
 			$hashKey = 'conversation:room:' . $roomId . $msg;
 			$hashData = Redis::hgetall($hashKey);
-
-			$hashData['attachment'] = json_decode($hashData['attachment'], true);
 			
 			$messages[] = $hashData;
 		}
 
 		return $messages;
 
+	}
+
+	/**
+	 * Delete all messages by user
+	 * 
+	 * @param Int $userId
+	 * @param Int $roomId
+	 * @return Int
+	 */
+
+	public static function deleteAllByUserId( Int $userId, Int $roomId ) {
+		$setChannel = 'messages:room:' . $roomId;
+		$valuesFromSet = Redis::zrange($setChannel, 0, -1);
+		$deletedMessages = 0;
+
+		foreach($valuesFromSet as $msg) {
+			$hashKey = 'conversation:room:' . $roomId . $msg;
+			$fromUser = (int) Redis::hget($hashKey, 'from');
+			
+			if ($fromUser === $userId) {
+				Redis::del($hashKey);
+				Redis::zrem($setChannel, $msg);
+				$deletedMessages++;
+			}
+		}
+
+		return $deletedMessages;
 	}
 
 	private static function saveImgOnServer( String $urlData ) {

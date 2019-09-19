@@ -4,6 +4,9 @@
 @guest
 // Hello
 @else
+@if (Auth::user()->is_admin === 1)
+	<admin-dashboard :token="{{ json_encode(Auth::user()->api_token) }}"></admin-dashboard>
+@else
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -34,5 +37,6 @@
         </div>
     </div>
 </div>
+@endif
 @endguest
 @endsection

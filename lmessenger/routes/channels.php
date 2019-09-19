@@ -26,6 +26,6 @@ Broadcast::channel('chat_room.{room_id}', function ( $user, $room_id ) {
 	}*/
 
 	if ( $user->id === Auth::user()->id ) {
-		return [ 'id' => $user->id , 'name' => $user->name ];
+		return [ 'id' => $user->id , 'name' => $user->name, 'social_id' => $user->social_id ];
 	}
 });

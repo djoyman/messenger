@@ -54,14 +54,16 @@ class LoginController extends Controller
 
 	public function access($id) {
 
-		Cookie::queue(Cookie::make('room_access', $id, 60));
+		//Cookie::queue(Cookie::make('room_access', $id, 60));
+
+		$cookie = Cookie::make('room_access', $id, 60);
 
 		if (Auth::check()) {
-			$room = '/room/' . Cookie::get('room_access');
-			return redirect()->to($room);
+			$room = '/room/' . $id;
+			return redirect()->to($room)->withCookie($cookie);
 		}
 
-		return redirect()->to('/login');
+		return redirect()->to('/login')->withCookie($cookie);
 	}
 	
 	/**

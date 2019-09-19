@@ -29,7 +29,7 @@ class MessageController extends Controller
 
 		$result = Message::create( json_decode($data, true) );
 
-		if (count($result) > 0) {
+		if ( count($result) > 0) {
 			broadcast(new SendMessage( json_encode($result) ))->toOthers();
 		}
 	}

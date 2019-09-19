@@ -1,7 +1,7 @@
 <template>
 	<div class="app-container">
 		<Navigation :user="user" :room="room" :typing="typingUsers" @userListClickEvent="openSideBar('users')" @settingsClickEvent="openSideBar('settings')" />
-		<ChatMessageFeed @loadMoreMessages="getMessageHistory" @onPreviewClick="makePreview" @scrollBottomEvent="scrollToBottom" :messages="chatMessages" :user="user" />
+		<ChatMessageFeed @loadMoreMessages="getMessageHistory" @onPreviewClick="makePreview" @scrollBottomEvent="scrollToBottom" :messages="chatMessages" />
 		<ChatMessageComposer @sendEvent="onRegisterNewMessage" @userTypingEvent="onTypingEvent" :users="chatUsers" />
 		<ChatUsers :users="chatUsers" />
 		<!-- <ChatSettings :user="user" /> -->
@@ -46,7 +46,6 @@ export default {
 			chatMessages: [],
 			typingUsers: [],
 			messageText: '',
-			timerFlag: false,
 			page: 1,
 		}
 	},
@@ -127,7 +126,9 @@ export default {
 				'content': this.messageText,
 				'from': this.user.id,
 				'room_id': this.room.id,
-				'attachment': msgData.image
+				'attachment:source': msgData.image.source,
+				'attachment:width': msgData.image.width,
+				'attachment:height': msgData.image.height,
 			}
 
 			fetch(`../api/messages?api_token=${this.token}`, {

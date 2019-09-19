@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,5 +19,9 @@ Route::middleware(['auth:api', 'throttle:60,10'])->group(function () {
 	Route::post('messages', 'MessageController@send');
 
 	Route::get('messages/history/{roomId}', 'MessageController@getMessageHistory');
+
+	Route::get('admin/users/{userId}', 'HomeController@getUser');
+	Route::put('admin/users/ban/{roomId}/{userId}', 'HomeController@banUser');
+	Route::get('admin/channels', 'HomeController@getChannels');
 
 });
