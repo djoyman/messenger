@@ -11,7 +11,7 @@
 			<div class="content">
 				<p class="name">{{ message.name }} <span class="date">{{ getDateString(message.date) }}</span></p>
 				<p class="text">{{ message.content }}</p>
-				<img class="image" v-if="message['attachment:source'].length > 0" @click.prevent="openPreview(message.attachment.source)" :src="`${ message['attachment:source'] }`" width="200" :height="`${ calcHeight(message['attachment:width'], message['attachment:height']) }`" onerror="this.onerror=null;this.src='/images/blank.jpg';" loading="lazy">
+				<img class="image" v-if="message['attachment:source'].length > 0" @click.prevent="openPreview(message['attachment:source'])" :src="`${ message['attachment:source'] }`" width="200" :height="`${ calcHeight(message['attachment:width'], message['attachment:height']) }`" onerror="this.onerror=null;this.src='/images/blank.jpg';" loading="lazy">
 				<hr class="break">
 			</div>
 		</div>
