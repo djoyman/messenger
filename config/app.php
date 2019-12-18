@@ -168,6 +168,7 @@ return [
 		//Laravel\Socialite\SocialiteServiceProvider::class,
 		\SocialiteProviders\Manager\ServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
+        Kreait\Laravel\Firebase\ServiceProvider::class,
 
         /*
          * Application Service Providers...
