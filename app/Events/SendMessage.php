@@ -42,7 +42,7 @@ class SendMessage implements ShouldBroadcast
     }
 
     private function notify($roomId) {
-        $serviceAccountPath = '../laravel-chat-aef99-9eac68ef187c.json';
+        $serviceAccountPath = '../../rusandroid-77d82-firebase-adminsdk-38xs7-113c545209.json';
         $messaging = (new Firebase\Factory())->withServiceAccount($serviceAccountPath)->createMessaging();            
         $message = CloudMessage::withTarget('topic', $roomId)
             ->withNotification(\Kreait\Firebase\Messaging\Notification::create('Title', 'Body'))
