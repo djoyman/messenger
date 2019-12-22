@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Redis;
 use Image;
 
 use function GuzzleHttp\json_decode;
+use Illuminate\Support\Facades\Log;
 
 class Message extends Model
 {
@@ -18,7 +19,11 @@ class Message extends Model
 	 */
 	
 	public static function create( Array $data ) {
-		
+		$logMessage = $data['room_id'];
+		$logMessage = $logMessage.' '.$data['name'];
+		$logMessage = $logMessage.' '.$data['content'];
+		Log::info('>>> create message::'.$logMessage);
+
 		$messageLimit = 500000;
 
 		$setChannel = 'messages:room:' . $data['room_id'];
