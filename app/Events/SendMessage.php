@@ -9,8 +9,6 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Kreait\Firebase;
-use Kreait\Firebase\Messaging\CloudMessage;
 
 class SendMessage implements ShouldBroadcast
 {
@@ -35,18 +33,6 @@ class SendMessage implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        $roomId = $this->data['room_id'];
-        $channel = new PresenceChannel('chat_room.' . $roomId);
-        $this->notify($roomId);
-        return $channel;
-    }
-
-    private function notify($roomId) {
-        $serviceAccountPath = '../laravel-chat-aef99-9eac68ef187c.json';
-        $messaging = (new Firebase\Factory())->withServiceAccount($serviceAccountPath)->createMessaging();            
-        $message = CloudMessage::withTarget('topic', $roomId)
-            ->withNotification(\Kreait\Firebase\Messaging\Notification::create('Title', 'Body'))
-            ->withData(['key' => 'new message']);
-        $messaging->send($message);
+        return new PresenceChannel('chat_room.' . $this->data['room_id']);
     }
 }

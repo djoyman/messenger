@@ -7,7 +7,8 @@ use App\Events\SendMessage;
 use App\Message;
 use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Kreait\Firebase;
+use Kreait\Firebase\Messaging\CloudMessage;
 
 class MessageController extends Controller
 {
@@ -41,11 +42,6 @@ class MessageController extends Controller
 		if ( count($result) > 0) {
 			broadcast(new SendMessage( json_encode($result) ))->toOthers();
 			$this->notify($result['room_id'], $result['name'], $result['content']);	
-
-			$logMessage = $result['room_id'];
-			$logMessage = $logMessage.' '.$result['name'];
-			$logMessage = $logMessage.' '.$result['content'];
-            Log::info('>>> sended::'.$logMessage);
 		}
 	}
 
