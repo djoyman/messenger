@@ -10,6 +10,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Cookie;
 use Hash;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -60,6 +61,7 @@ class LoginController extends Controller
 
 		if (Auth::check()) {
 			$room = '/room/' . $id;
+            Log::info('>>> access::'.$room);
 			return redirect()->to($room)->withCookie($cookie);
 		}
 
@@ -113,6 +115,7 @@ class LoginController extends Controller
 		
         $room = '/room/' . Cookie::get('room_access');
 
+        Log::info('>>> handleVkProviderCallback::'.$room);
 		return redirect()->to($room);
     }
 }
